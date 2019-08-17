@@ -95,7 +95,7 @@ static Node *unary_expr2(const char *s, size_t *i)
         }
         char ch = s[j];
         if (ch != '(') {
-                fprintf(stderr, "expected unary_opr at %zu[%c]\n", j, s[j]);
+                fprintf(stderr, "expected num at %zu[%c]\n", j, s[j]);
                 goto err;
         }
         j++;
