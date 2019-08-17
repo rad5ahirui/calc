@@ -1,0 +1,5 @@
+expr = mul_expr (["+" | "-"] mul_expr)*
+mul_expr = unary_expr (["*" | "/"] unary_expr)*
+unary_expr = num | "(" expr ")" | unary_opr num | unary_opr "(" expr ")"
+unary_opr = "+" | "-"
+num = [0-9]+
