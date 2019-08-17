@@ -147,22 +147,16 @@ static Node *mul_expr(const char *s, size_t *i)
         if (child == NULL)
                 goto err;
         node_add(node, child);
-        for (;;) {
-                char op = s[j];
-                if (op == '\0' || op == '+' || op == '-' || op == ')') {
-                        *i = j;
-                        return node;
-                } else if (op == '*' || op == '/') {
-                        node->children[node->len - 1].op = op;
-                } else {
-                        fprintf(stderr, "expected * or / at %zu[%c]\n", j, s[j]);
-                        goto err;
-                }
+        char op;
+        while ((op = s[j]) == '*' || op == '/') {
                 j++;
+                node->children[node->len - 1].op = op;
                 if ((child = unary_expr(s, &j)) == NULL)
                         goto err;
                 node_add(node, child);
         }
+        *i = j;
+        return node;
 err:
         node_delete(node);
         return NULL;
@@ -176,23 +170,16 @@ static Node *expr(const char *s, size_t *i)
         if (child == NULL)
                 goto err;
         node_add(node, child);
-        for (;;) {
-                char op = s[j];
-                if (op == '\0' || op == ')') {
-                        *i = j;
-                        return node;
-                }
-                if (op == '+' || op == '-') {
-                        node->children[node->len - 1].op = op;
-                } else {
-                        fprintf(stderr, "expected + or - at %zu[%c]\n", j, s[j]);
-                        goto err;
-                }
+        char op;
+        while ((op = s[j]) == '+' || op == '-') {
                 j++;
+                node->children[node->len - 1].op = op;
                 if ((child = mul_expr(s, &j)) == NULL)
                         goto err;
                 node_add(node, child);
         }
+        *i = j;
+        return node;
 err:
         node_delete(node);
         return NULL;
@@ -201,7 +188,12 @@ err:
 Node *parse(const char *s)
 {
         size_t i = 0;
-        return expr(s, &i);
+        Node *node = expr(s, &i);
+        if (s[i] == '\0')
+                return node;
+        fprintf(stderr, "expected +, -, *, or / at %zu[%c]\n", i, s[i]);
+        node_delete(node);
+        return NULL;
 }
 
 int calc(const Node *node)
