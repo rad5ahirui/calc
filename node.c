@@ -7,6 +7,7 @@
 
 static void die(void);
 static Node *node_new(Type type);
+static Node *node_add(Node *node, Node *child);
 static size_t skip(const char *s, size_t i);
 static Node *num(const char *s, size_t *i);
 static Node *unary_expr2(const char *s, size_t *i);
